@@ -1,0 +1,51 @@
+Writing Findings & Feature Engineering
+Fixing the two most common data science mindset gaps
+The Real Problem: Thinking Like a Programmer, Not a Domain
+Expert
+When you look at column names and 'nothing clicks,' and when you can spot observations but
+can't say what they imply — both happen because you're looking at data as rows and
+columns rather than as a story about real-world things. This is the single most important
+mindset shift in data science.
+Problem 1: Writing Findings — You're Missing the 'So What'
+Your findings sound vague because you stop at the observation. Every finding has three
+parts:
+What — what you observed
+e.g. "Feature X is right-skewed"
+Why it matters — what it implies
+e.g. "meaning most values are low with a few extreme highs"
+What you'll do about it — the action
+e.g. "I'll apply a log transform before modeling"
+You're writing only the first part. Practice forcing yourself to always complete the other two.
+Use this sentence structure every time:
+"[Observation], which means [implication], so I will [action]."
+It feels mechanical at first but it trains the habit. Vocabulary isn't your real problem —
+structure is. Once you have structure, the right words follow naturally.
+Problem 2: Feature Engineering — You're Skipping the Domain
+Thinking Step
+When nothing clicks from column names, it's because you're jumping straight to 'what
+technique do I apply?' instead of asking 'what is this data actually about?' Before touching any
+code, spend 5 minutes asking:
+ What real-world process generated this data?
+ What would a human expert in this field care about?
+ What combinations or ratios would be meaningful to a person, not a model?
+A concrete example:
+If you have an e-commerce dataset with purchase_amount and num_items — a
+programmer sees two columns. A domain thinker sees average item price
+(purchase_amount / num_items), which might be far more predictive than either
+column alone. The feature came from thinking about shopping behavior, not from
+thinking about data.
+This is why practicing on datasets from familiar domains helps enormously. If you've ever
+shopped online, taken a loan, or tracked fitness — you already have domain intuition you're
+not using.
+What To Do This Week
+For writing:
+Take your last EDA and rewrite every finding using the What → Why it matters →
+Action structure. Do this for 5 findings. You'll immediately feel the difference.
+For feature engineering:
+Next dataset you open, close your laptop for 10 minutes first and just think — 'what is
+this data about, and what would a smart person in this field want to measure that isn't
+directly in the columns?' Write 3 ideas on paper before coding anything. Even if the
+ideas are wrong, this habit is what separates people who can engineer features from
+those who can't.
+The gap you're experiencing isn't about vocabulary or techniques. It's about building the habit
+of thinking about meaning before jumping to code.
