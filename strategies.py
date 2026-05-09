@@ -5,25 +5,14 @@ from openai import AsyncOpenAI, OpenAI
 from rich.console import Console
 
 load_dotenv()
-MODEL = {
-    "gemini": "gemini-3-flash-preview",
-    "minmax": "minimax/minimax-m2.5:free",
-    "glm": "zai-org/GLM-5.1:fireworks-ai"
-}
 
-BASE_URL = {
-    "huggingface": "https://router.huggingface.co/v1",
-    "openrouter": "https://openrouter.ai/api/v1",
-    "google": "https://generativelanguage.googleapis.com/v1beta/"
-}
 
-async def summarize_chunk(client, chunk, index, config: dict) -> str:
-    Console().print("[yellow]Summarizing...[/]")
+async def summarize_chunk(client, chunk, config: dict) -> str:
     response = await client.chat.completions.create(
-        model = MODEL[config["model"]],
-        max_tokens = 1000,
+        model = config["model"],
+        max_tokens = 700,
         messages=[
-            {"role": "system", "content":"generate short summary(around 800 tokens) of the given text"},
+            {"role": "assistant", "content":"generate short summary of the given text"},
             {"role": "user", "content": chunk}
         ]
     )
@@ -32,12 +21,12 @@ async def summarize_chunk(client, chunk, index, config: dict) -> str:
 
 async def map_step(chunks, config) -> list:
     client = AsyncOpenAI(
-        base_url = BASE_URL[config["url"]],
-        api_key = os.getenv("GOOGLE_AI_STUDIO"),
+        base_url = config["url"],
+        api_key = os.getenv(config["api"])
     )
 
     # create a task for every chunk
-    tasks = [summarize_chunk(client, chunk, i, config) for i, chunk in enumerate(chunks)]
+    tasks = [summarize_chunk(client, chunk, config) for chunk in chunks]
 
     # fire all tasks in parallel, wait for all
     summaries = await asyncio.gather(*tasks)
@@ -46,14 +35,14 @@ async def map_step(chunks, config) -> list:
 
 async def reduce_step(Summary_chunks, config) -> str:
     client = AsyncOpenAI(
-        base_url = BASE_URL[config["url"]],
-        api_key = os.getenv("GOOGLE_AI_STUDIO")
+        base_url = config["url"],
+        api_key = os.getenv(config["api"])
     )
-
+    print(Summary_chunks)
     chunk = " ".join(Summary_chunks)
 
     # create a single summary
-    summary = await summarize_chunk(client, chunk, 0, config)
+    summary = await summarize_chunk(client, chunk, config)
 
     return summary
 
@@ -64,12 +53,24 @@ async def stuff(chunk, config):
     """
 
     client = AsyncOpenAI(
-        base_url = BASE_URL[config["url"]],
-        api_key = os.getenv("HF_TOKEN")
+        base_url = config["url"],
+        api_key = os.getenv(config["api"])
     )
 
     # get summary
-    summary = await summarize_chunk(client, chunk[0], 0, config)
-    print(summary)
+    summary = await summarize_chunk(client, chunk[0], config)
 
     return summary
+
+
+# async def refine(chunks, config):
+#     client = AsyncOpenAI(
+#         base_url = BASE_URL[config["url"]],
+#         api_key = os.getenv("HF_TOKEN")
+#     )
+
+#     previous_summary = ""
+#     final_summary = ""
+#     chunk1_summary = summarize_chunk(client, chunks[0][0], 0)
+#     for i in range(len(chunks)-1):
+

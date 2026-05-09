@@ -1,5 +1,4 @@
 import tiktoken
-import tiktoken
 
 
 def chunker(text, chunk_size=1000, overlap=100):
