@@ -7,12 +7,13 @@ from rich.console import Console
 load_dotenv()
 
 
-async def summarize_chunk(client, chunk, config: dict) -> str:
+async def summarize_chunk(client, chunk, config: dict, prompt=None) -> str:
+    system_prompt = prompt or "Generate a short summary (around 800 tokens) of the given text."
     response = await client.chat.completions.create(
         model = config["model"],
         max_tokens = 700,
         messages=[
-            {"role": "assistant", "content":"generate short summary of the given text"},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": chunk}
         ]
     )
@@ -34,6 +35,8 @@ async def map_step(chunks, config) -> list:
 
 
 async def reduce_step(Summary_chunks, config) -> str:
+    reduce_prompt = "You are given summaries of different sections of a document. Combine them into one coherent, concise final summary."
+
     client = AsyncOpenAI(
         base_url = config["url"],
         api_key = os.getenv(config["api"])
@@ -42,7 +45,7 @@ async def reduce_step(Summary_chunks, config) -> str:
     chunk = " ".join(Summary_chunks)
 
     # create a single summary
-    summary = await summarize_chunk(client, chunk, config)
+    summary = await summarize_chunk(client, chunk, config, reduce_prompt)
 
     return summary
 
