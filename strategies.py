@@ -1,17 +1,16 @@
 import os
 import asyncio
 from dotenv import load_dotenv
-from openai import AsyncOpenAI, OpenAI
-from rich.console import Console
+from openai import AsyncOpenAI
 
 load_dotenv()
 
 
-async def summarize_chunk(client, chunk, config: dict, prompt=None) -> str:
+async def summarize_chunk(client, chunk: str, config: dict, prompt=None) -> str:
     system_prompt = prompt or "Generate a short summary (around 800 tokens) of the given text."
     response = await client.chat.completions.create(
         model = config["model"],
-        max_tokens = 700,
+        max_tokens = 900,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": chunk}
@@ -66,14 +65,26 @@ async def stuff(chunk, config):
     return summary
 
 
-# async def refine(chunks, config):
-#     client = AsyncOpenAI(
-#         base_url = BASE_URL[config["url"]],
-#         api_key = os.getenv("HF_TOKEN")
-#     )
+async def refine(chunks: list, config:dict):
+    """
+    Usage previous summary and current chunk to generate summary.
+    """
+    client = AsyncOpenAI(
+        base_url = config["url"],
+        api_key = os.getenv(config["api"])
+    )
 
-#     previous_summary = ""
-#     final_summary = ""
-#     chunk1_summary = summarize_chunk(client, chunks[0][0], 0)
-#     for i in range(len(chunks)-1):
+    running_summary = await summarize_chunk(client, chunks[0], config)
+
+    for chunk in chunks[1:]:
+        print(chunk)
+        print("\n\n\n\n")
+        refine_prompt = f"""You have a running summary so far:
+---
+{running_summary}
+---
+Refine and extend it with the following new section. Do not lose important information."""
+        running_summary = await summarize_chunk(client, chunks[0], config, refine_prompt)
+    
+    return running_summary
 
