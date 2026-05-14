@@ -1,0 +1,40 @@
+How to Improve at EDA in Data Science
+A practical framework for structured exploratory data analysis
+The Core Problem: EDA Without a Question is Just Wandering
+EDA should always be driven by questions, not by tools. Before touching any code, ask
+yourself: "What am I trying to understand about this data?" Every plot, every .describe(), every
+correlation matrix should be answering a specific question. If you can't state the question,
+don't run the code yet.
+A Simple Mental Framework: Three Layers
+Think of EDA in three layers, in order:
+1. Understand your data's structure
+What do I have? How many rows/columns, what types, how much missing data, any
+obvious errors? This is fast and mechanical. Use .info(), .describe(), and null counts.
+Done.
+2. Understand each variable individually
+What does each feature look like? Is it skewed? Are there outliers? What's the range?
+Use one plot per variable — histogram for continuous, bar chart for categorical. The goal
+is spotting anomalies and understanding distributions, not making things pretty.
+3. Understand relationships
+How do features relate to each other and to the target? This is where most of the insight
+lives. Use correlation for numerics, group-by comparisons for categoricals vs target, and
+scatter plots for suspicious pairs.
+That's it. You don't need to go deeper unless something you found raises a new question.
+Why You Over-Explore
+Over-exploration usually happens because you're exploring without a stopping condition. After
+each step, ask: "Did this change what I think about the data or the model I'll build?" If the
+answer is no, move on. EDA is not about being thorough — it's about being useful. A
+30-minute focused EDA often beats a 3-hour exhaustive one.
+How to Actually Improve
+The best thing you can do right now is practice EDA before looking at other people's
+notebooks. Pick a dataset from Kaggle, spend 30–45 minutes doing EDA using only the
+framework above, write down 5 observations in plain English, then look at how others
+approached it. Compare what you found vs what you missed and why. This gap is where the
+learning is.
+Also, after each EDA session, write a short summary like: "The target is imbalanced. Feature
+X is heavily skewed. Features A and B are correlated and I might drop one." If you can't write
+that summary, you were exploring without purpose.
+The Mental Shift
+Go from "let me explore everything" to "let me answer specific questions until I feel confident I
+understand the data well enough to model it." That single shift will transform how you
+approach every dataset.

@@ -4,6 +4,8 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 from dotenv import load_dotenv
 import asyncio
+import tomllib
+
 
 from loader import file_extract
 from chunker import chunker
@@ -13,17 +15,13 @@ from strategies import *
 load_dotenv()
 console = Console()
 
-MODEL = {
-    "gemini": {"model":"gemini-3-flash-preview", "url":"https://generativelanguage.googleapis.com/v1beta/", "api":"GOOGLE_AI_STUDIO"},
-    "minmax": {"model":"minimax/minimax-m2.5:free", "url":"https://openrouter.ai/api/v1", "api":"OPENROUTER_API_KEY_2"},
-    "glm": {"model":"zai-org/GLM-5.1:fireworks-ai", "url":"https://router.huggingface.co/v1", "api":"HF_TOKEN"}
-}
-
 def choose_model():
+
     model = {
         1: "gemini",
         2: "minmax",
-        3: "glm"
+        3: "glm",
+        4: "qwen"
     }
 
     console.print("[bold]Choose Model:")
@@ -31,10 +29,19 @@ def choose_model():
         console.print(f" [bold]{key}[/]. {model[key].capitalize()}")
     model_choice = int(Prompt.ask("Enter Number", choices=["1", "2", "3"], default="1"))
 
-    console.print(Panel(f"[green]Model: {model[model_choice]}[/GREEN]\n[dim]Api Provider:"\
-                         f" {MODEL[model[model_choice]]["api"].upper()}", border_style='green'))
+    # read toml file
+    with open("llm_config.toml", 'rb') as f:
+        llm_config = tomllib.load(f)
 
-    return MODEL[model[model_choice]]
+    ACTIVE_MODEL = model[model_choice]
+    llm = {
+        "BASE_URL": llm_config['models'][ACTIVE_MODEL]["url"],
+        "API": llm_config['models'][ACTIVE_MODEL]["api"],
+        "MODEL": llm_config['models'][ACTIVE_MODEL]["name"]
+    }
+
+    return llm
+
 
 async def run_map_reduce(chunks, config):
     summaries = await map_step(chunks, config)      # await, not asyncio.run
@@ -82,3 +89,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

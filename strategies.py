@@ -9,7 +9,7 @@ load_dotenv()
 async def summarize_chunk(client, chunk: str, config: dict, prompt=None) -> str:
     system_prompt = prompt or "Generate a short summary (around 800 tokens) of the given text."
     response = await client.chat.completions.create(
-        model = config["model"],
+        model = config["MODEL"],
         max_tokens = 900,
         messages=[
             {"role": "system", "content": system_prompt},
@@ -21,8 +21,8 @@ async def summarize_chunk(client, chunk: str, config: dict, prompt=None) -> str:
 
 async def map_step(chunks, config) -> list:
     client = AsyncOpenAI(
-        base_url = config["url"],
-        api_key = os.getenv(config["api"])
+        base_url = config["BASE_URL"],
+        api_key = os.getenv(config["API"])
     )
 
     # create a task for every chunk
@@ -37,8 +37,8 @@ async def reduce_step(Summary_chunks, config) -> str:
     reduce_prompt = "You are given summaries of different sections of a document. Combine them into one coherent, concise final summary."
 
     client = AsyncOpenAI(
-        base_url = config["url"],
-        api_key = os.getenv(config["api"])
+        base_url = config["BASE_URL"],
+        api_key = os.getenv(config["API"])
     )
     print(Summary_chunks)
     chunk = " ".join(Summary_chunks)
@@ -55,8 +55,8 @@ async def stuff(chunk, config):
     """
 
     client = AsyncOpenAI(
-        base_url = config["url"],
-        api_key = os.getenv(config["api"])
+        base_url = config["BASE_URL"],
+        api_key = os.getenv(config["API"])
     )
 
     # get summary
@@ -70,8 +70,8 @@ async def refine(chunks: list, config:dict):
     Usage previous summary and current chunk to generate summary.
     """
     client = AsyncOpenAI(
-        base_url = config["url"],
-        api_key = os.getenv(config["api"])
+        base_url = config["BASE_URL"],
+        api_key = os.getenv(config["API"])
     )
 
     running_summary = await summarize_chunk(client, chunks[0], config)
